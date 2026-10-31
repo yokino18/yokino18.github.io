@@ -17,9 +17,9 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    # 试运行阶段指向 new.casto.top；正式切回 blog.casto.top 时改这一行（或删掉，默认即正式域名）
+    # 现在发布在用户站点根路径；将来绑自定义域名时把这里改成 https://你的域名
     env:
-      SITE_URL: https://new.casto.top
+      SITE_URL: https://yokino18.github.io
     steps:
       - name: Checkout
         uses: actions/checkout@v4
