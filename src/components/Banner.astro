@@ -1,0 +1,43 @@
+---
+import { getImage } from 'astro:assets';
+import { SITE, WALLPAPERS } from '../lib/site';
+
+interface Props {
+  title: string;
+  subtitle?: string;
+  isHome?: boolean;
+}
+const { title, subtitle, isHome = false } = Astro.props;
+const source = isHome ? WALLPAPERS.home : WALLPAPERS.inner;
+// 响应式：按视口宽度生成 640/960/1280/1920 四档 webp，首屏 eager
+const image = await getImage({
+  src: source,
+  widths: [640, 960, 1280, 1920],
+  sizes: '100vw',
+  formats: ['webp'],
+  quality: 80,
+});
+---
+<div class="banner-wrap">
+  <div class="banner" data-banner>
+    <img
+      src={image.src}
+      srcset={image.srcSet.attribute}
+      sizes={image.attributes.sizes}
+      width={image.attributes.width}
+      height={image.attributes.height}
+      alt=""
+      class="absolute inset-0 h-full w-full object-cover"
+      loading="eager"
+      decoding="async"
+      fetchpriority={isHome ? 'high' : 'auto'}
+    />
+
+    <div class="banner-dim-overlay"></div>
+    <div class="banner-home-text-overlay" data-banner-text>
+      <h1 class="banner-title">{title}</h1>
+      {subtitle && <p class="banner-subtitle">{subtitle}</p>}
+    </div>
+    <div class="wallpaper-gradient"></div>
+  </div>
+</div>

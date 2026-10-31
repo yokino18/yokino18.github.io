@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SearchPanel from '../components/client/SearchPanel.astro';
+import SettingsPanel from '../components/client/SettingsPanel.astro';
+import { getAllPosts, getTaxonomies } from '../lib/stats';
+
+const posts = await getAllPosts();
+const { tags } = getTaxonomies(posts);
+---
+<BaseLayout title="标签" bannerTitle="标签">
+  <SearchPanel />
+  <SettingsPanel />
+  <div class="mx-auto max-w-3xl pb-10 pt-6">
+    <div class="card-base flex flex-wrap gap-2 p-6">
+      {tags.map((t) => (
+        <a href={`/archive/?tag=${encodeURIComponent(t.name)}`} class="badge text-sm">#{t.name} ({t.count})</a>
+      ))}
+    </div>
+  </div>
+</BaseLayout>

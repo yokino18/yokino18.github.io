@@ -1,0 +1,38 @@
+# 评论数据定时备份（每周日 03:00 UTC）
+# 使用前在仓库 Settings → Secrets 中配置：
+#   WALINE_SERVER / WALINE_TOKEN（推荐在 Waline 管理端生成长期 token）
+#   TWIKOO_SERVER / TWIKOO_TOKEN（如使用 Twikoo，则用这两个）
+name: 评论备份
+on:
+  schedule:
+    - cron: '0 3 * * 0'
+  workflow_dispatch:
+
+jobs:
+  backup-comments:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: 安装依赖
+        run: npm ci || npm install
+      - name: 导出评论
+        run: |
+          node scripts/backup-comments.mjs \
+            --service waline \
+            --server "$WALINE_SERVER" \
+            --token "$WALINE_TOKEN" \
+            --out backups/comments-$(date +%F).json
+        env:
+          WALINE_SERVER: ${{ secrets.WALINE_SERVER }}
+          WALINE_TOKEN: ${{ secrets.WALINE_TOKEN }}
+        continue-on-error: true
+      - name: 提交备份
+        run: |
+          git config user.name "backup-bot"
+          git config user.email "backup-bot@users.noreply.github.com"
+          git add backups
+          git commit -m "chore: 评论备份 $(date +%F)" || true
+          git push

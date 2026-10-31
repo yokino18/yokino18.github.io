@@ -1,0 +1,58 @@
+---
+import { COMMENTS } from '../../lib/site';
+interface Props { title?: string; storageKey?: string }
+const { title = '留言', storageKey = 'comments' } = Astro.props;
+const key = storageKey + '_' + Astro.url.pathname;
+const useWaline = COMMENTS.provider === 'waline' && Boolean(COMMENTS.serverURL);
+---
+<div class="card-base p-5 onload-animation">
+  <p class="widget-title">{title}</p>
+  {useWaline ? (
+    <div id="waline" class="mt-4" data-waline-server={COMMENTS.serverURL} data-waline-path={Astro.url.pathname}></div>
+  ) : (
+    <>
+      <p class="mt-2 text-xs" style="color: var(--muted)">演示评论组件（数据保存在浏览器本地）。在 <code>src/lib/site.ts</code> 配置 Waline 服务地址后自动切换为在线评论。</p>
+      <form data-comment-form class="mt-4 space-y-2">
+        <input data-c-name type="text" placeholder="昵称" maxlength="30" class="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-primary" style="background: var(--page-bg); border-color: var(--border)" required />
+        <textarea data-c-content rows="3" placeholder="说点什么……" maxlength="500" class="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-primary" style="background: var(--page-bg); border-color: var(--border)" required></textarea>
+        <button type="submit" class="scale-animation rounded-lg px-4 py-1.5 text-sm text-(--btn-content)" style="background: var(--primary)">发表</button>
+      </form>
+      <ul data-comment-list class="mt-4 space-y-3 text-sm" data-comment-key={key}></ul>
+    </>
+  )}
+</div>
+
+{useWaline && (
+  <script is:inline>
+    (function () {
+      var el = document.getElementById('waline');
+      if (!el || !window.Waline) {
+        var s = document.createElement('script');
+        s.src = 'https://unpkg.com/@waline/client@v3/dist/waline.js';
+        s.onload = initWaline;
+        s.onerror = function () { el.innerHTML = '<p style="color:var(--muted);font-size:0.85rem">评论服务加载失败，请稍后重试。</p>'; };
+        document.head.appendChild(s);
+      }
+      function initWaline() {
+        var el = document.getElementById('waline');
+        if (!el || !window.Waline) return;
+        var dark = document.documentElement.classList.contains('dark');
+        window.Waline.init({
+          el: '#waline',
+          serverURL: el.dataset.walineServer,
+          path: el.dataset.walinePath,
+          dark: dark,
+          lang: 'zh-CN',
+        });
+      }
+      var themeObserver = new MutationObserver(function () {
+        var el = document.getElementById('waline');
+        if (el && window.Waline && window.Waline.update) {
+          window.Waline.update({ dark: document.documentElement.classList.contains('dark') });
+        }
+      });
+      themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+      if (window.Waline) initWaline();
+    })();
+  </script>
+)}

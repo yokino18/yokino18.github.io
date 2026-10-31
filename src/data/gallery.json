@@ -1,0 +1,44 @@
+[
+  {
+    "slug": "firefly-2026",
+    "title": "Firefly 2026",
+    "description": "博客主题相关的图片收录",
+    "cover": "/gallery/cover-firefly.svg",
+    "images": [
+      { "src": "/gallery/pic1.svg", "alt": "主页横幅效果" },
+      { "src": "/gallery/pic2.svg", "alt": "卡片与侧栏" },
+      { "src": "/gallery/pic3.svg", "alt": "暗色模式" }
+    ]
+  },
+  {
+    "slug": "castorice-2026",
+    "title": "Castorice 2026",
+    "description": "一些随手保存的图片",
+    "cover": "/gallery/cover-castorice.svg",
+    "images": [
+      { "src": "/gallery/pic4.svg", "alt": "示例图片一" },
+      { "src": "/gallery/pic5.svg", "alt": "示例图片二" }
+    ]
+  },
+  {
+    "slug": "encrypted-test",
+    "title": "加密相册（测试）",
+    "description": "输入密码 casto 可查看的加密相册",
+    "password": "casto",
+    "cover": "/gallery/cover-lock.svg",
+    "images": [
+      { "src": "/gallery/pic6.svg", "alt": "加密内容一" },
+      { "src": "/gallery/pic7.svg", "alt": "加密内容二" }
+    ]
+  },
+  {
+    "slug": "live",
+    "title": "生活随拍",
+    "description": "个人摄影作品收录",
+    "cover": "/gallery/cover-live.svg",
+    "images": [
+      { "src": "/gallery/photo-cloud.svg", "alt": "傍晚的云" },
+      { "src": "/gallery/photo-lake.svg", "alt": "湖面" }
+    ]
+  }
+]

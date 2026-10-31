@@ -1,0 +1,45 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SearchPanel from '../components/client/SearchPanel.astro';
+import SettingsPanel from '../components/client/SettingsPanel.astro';
+import friends from '../data/friends.json';
+import type { Friend } from '../lib/types';
+
+const list = friends as Friend[];
+const groups = new Map<string, Friend[]>();
+for (const f of list) {
+  const g = f.group || '默认';
+  if (!groups.has(g)) groups.set(g, []);
+  groups.get(g)!.push(f);
+}
+const groupList = [...groups.entries()];
+---
+<BaseLayout title="友链" bannerTitle="友链">
+  <SearchPanel />
+  <SettingsPanel />
+  <div class="mx-auto max-w-4xl space-y-6 pb-10 pt-6">
+    <div class="card-base p-6">
+      <p class="widget-title">申请友链</p>
+      <p class="mt-3 text-sm leading-relaxed" style="color: var(--muted)">
+        请按以下格式申请，并在你的站点先加上本站链接：<br />
+        站点名：xxx / 链接：https://xxx / 头像：https://xxx/avatar.png / 简介：一句话介绍
+      </p>
+    </div>
+    {groupList.map(([group, items]) => (
+      <section>
+        <h2 class="widget-title mb-3">{group} <span class="badge">{items.length}</span></h2>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 stagger">
+          {items.map((f) => (
+            <a href={f.url} target="_blank" rel="noopener" class="card-base card-hover flex items-center gap-4 p-5">
+              <img src={f.avatar} alt={f.name} loading="lazy" decoding="async" width="112" height="112" class="h-14 w-14 shrink-0 rounded-xl object-cover" />
+              <div class="min-w-0">
+                <p class="font-bold">{f.name}</p>
+                <p class="mt-1 line-clamp-2 text-sm" style="color: var(--muted)">{f.description}</p>
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+    ))}
+  </div>
+</BaseLayout>

@@ -1,0 +1,75 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostCard from '../components/PostCard.astro';
+import SearchPanel from '../components/client/SearchPanel.astro';
+import SettingsPanel from '../components/client/SettingsPanel.astro';
+import MusicPlayer from '../components/client/MusicPlayer.astro';
+import ProfileCard from '../components/widgets/ProfileCard.astro';
+import NoticeCard from '../components/widgets/NoticeCard.astro';
+import CategoriesWidget from '../components/widgets/CategoriesWidget.astro';
+import TagsWidget from '../components/widgets/TagsWidget.astro';
+import ArchiveWidget from '../components/widgets/ArchiveWidget.astro';
+import MomentsWidget from '../components/widgets/MomentsWidget.astro';
+import SiteStatsWidget from '../components/widgets/SiteStatsWidget.astro';
+import SiteInfoWidget from '../components/widgets/SiteInfoWidget.astro';
+import CalendarWidget from '../components/widgets/CalendarWidget.astro';
+import { SITE } from '../lib/site';
+import { getAllPosts, getTaxonomies, getArchive, getStats, getPostDates } from '../lib/stats';
+import moments from '../data/moments.json';
+import playlist from '../data/playlist.json';
+import { createRequire } from 'node:module';
+
+const posts = await getAllPosts();
+const { categories, tags } = getTaxonomies(posts);
+const archive = getArchive(posts);
+const stats = getStats(posts);
+const postDates = getPostDates(posts);
+const require = createRequire(import.meta.url);
+const astroVersion = `v${(require('astro/package.json') as { version: string }).version}`;
+const nodeVersion = process.version;
+// 只读环境变量，不 spawn 子进程：没有 pnpm/npm 的机器上不会刷报错，构建也更快
+function readPkgVersion(): string {
+  const ua = process.env.npm_config_user_agent ?? '';
+  const matched = /^(pnpm|npm|yarn)\/(\d+[\d.]*)/.exec(ua);
+  return matched ? `${matched[1]} ${matched[2]}` : '—';
+}
+const pkgManager = readPkgVersion();
+const buildTime = new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' });
+const platform = `${process.platform} / ${process.arch}`;
+---
+<BaseLayout isHome title={SITE.title} bannerTitle={SITE.bannerHomeTitle} bannerSubtitle={SITE.subtitle}>
+  <SearchPanel />
+  <SettingsPanel />
+  <div class="grid grid-cols-1 gap-4 pb-10 pt-4 md:grid-cols-[17.5rem_1fr] xl:grid-cols-[17.5rem_1fr_17.5rem]">
+    <aside class="hidden space-y-4 md:block">
+      <div data-widget="profile"><ProfileCard /></div>
+      <div data-widget="notice"><NoticeCard /></div>
+      <div data-widget="music"><MusicPlayer tracks={playlist} /></div>
+      <div data-widget="categories"><CategoriesWidget items={categories} /></div>
+      <div data-widget="tags"><TagsWidget items={tags} /></div>
+      <div data-widget="archive"><ArchiveWidget months={archive.months} total={archive.total} /></div>
+    </aside>
+
+    <div class="space-y-4 md:col-start-2 md:row-start-1">
+      <div class="posts-wrap stagger">
+        {posts.map((post) => <PostCard post={post} />)}
+      </div>
+    </div>
+
+    <aside class="hidden space-y-4 xl:block">
+      <div data-widget="moments"><MomentsWidget moments={moments.slice(0, 3)} /></div>
+      <div data-widget="stats"><SiteStatsWidget
+        articles={stats.articles}
+        moments={stats.moments}
+        categories={categories.length}
+        tags={tags.length}
+        words={stats.words}
+        uptimeDays={stats.uptimeDays}
+        lastActivityDays={stats.lastActivityDays}
+      /></div>
+      <div data-widget="info"><SiteInfoWidget astroVersion={astroVersion} nodeVersion={nodeVersion} pkgManager={pkgManager} buildTime={buildTime} platform={platform} /></div>
+      <div data-widget="calendar"><CalendarWidget postDates={postDates} /></div>
+    </aside>
+  </div>
+</BaseLayout>
+

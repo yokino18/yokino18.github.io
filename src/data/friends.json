@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Astro",
+    "group": "推荐",
+    "url": "https://astro.build/",
+    "avatar": "https://astro.build/favicon.svg",
+    "description": "构建快速、内容驱动的网站的前端框架。"
+  },
+  {
+    "name": "Fuwari",
+    "group": "推荐",
+    "url": "https://github.com/saicaca/fuwari",
+    "avatar": "https://raw.githubusercontent.com/saicaca/fuwari/main/public/favicon.svg",
+    "description": "灵感来源：一款淡雅美观的 Astro 博客模板。"
+  },
+  {
+    "name": "Waline",
+    "group": "工具",
+    "url": "https://waline.js.org/",
+    "avatar": "https://waline.js.org/logo.svg",
+    "description": "一款快速、简洁且高效的评论系统。"
+  }
+]

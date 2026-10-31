@@ -1,0 +1,15 @@
+---
+import { SITE } from '../lib/site';
+---
+<footer class="mx-auto mt-10 w-full px-2 pb-6 md:px-4">
+  <div class="card-base px-6 py-4 text-center text-sm" style="color: var(--muted)">
+    <p>
+      &copy; {new Date().getFullYear()} {SITE.title}. All Rights Reserved.
+      <span class="mx-2">/</span>
+      <a href="/rss.xml" class="hover:underline" style="color: var(--primary)">RSS</a>
+      <span class="mx-2">/</span>
+      <a href="/sitemap-index.xml" class="hover:underline" style="color: var(--primary)">Sitemap</a>
+    </p>
+    <p class="mt-1 text-xs">Powered by Astro &amp; Firefly · {SITE.license}</p>
+  </div>
+</footer>

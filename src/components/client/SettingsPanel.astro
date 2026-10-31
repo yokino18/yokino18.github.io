@@ -1,0 +1,63 @@
+<!-- 全局设置面板 -->
+<div id="settings-backdrop" class="overlay-backdrop"></div>
+<div id="settings-panel" class="float-panel top-20 right-4 left-4 max-h-[80vh] overflow-y-auto p-4 md:left-auto md:w-96">
+  <div class="flex items-center justify-between">
+    <p class="widget-title">设置</p>
+    <button type="button" data-settings-close class="scale-animation rounded-lg px-2 text-sm" style="color: var(--muted)">✕</button>
+  </div>
+
+  <p class="mt-5 text-xs font-semibold" style="color: var(--muted)">主题模式</p>
+  <div class="mt-2 grid grid-cols-3 gap-1.5" data-theme-group>
+    <button type="button" data-theme-btn="light" class="btn-theme rounded-lg px-2 py-1.5 text-xs transition">亮色</button>
+    <button type="button" data-theme-btn="dark" class="btn-theme rounded-lg px-2 py-1.5 text-xs transition">暗色</button>
+    <button type="button" data-theme-btn="system" class="btn-theme rounded-lg px-2 py-1.5 text-xs transition">跟随系统</button>
+  </div>
+
+  <p class="mt-5 text-xs font-semibold" style="color: var(--muted)">主题色相 <span id="hue-value" class="ml-1 font-normal"></span></p>
+  <input id="hue-slider" type="range" min="0" max="360" value="350" class="mt-2 w-full accent-(--primary)" />
+
+  <p class="mt-5 text-xs font-semibold" style="color: var(--muted)">壁纸模式</p>
+  <div class="mt-2 grid grid-cols-2 gap-1.5" data-wp-group>
+    <button type="button" data-wp-mode="banner" class="btn-theme rounded-lg px-2 py-1.5 text-xs transition">横幅壁纸</button>
+    <button type="button" data-wp-mode="fullscreen" class="btn-theme rounded-lg px-2 py-1.5 text-xs transition">全屏壁纸</button>
+    <button type="button" data-wp-mode="fullscreen-transparent" class="btn-theme rounded-lg px-2 py-1.5 text-xs transition">全屏透明</button>
+    <button type="button" data-wp-mode="solid" class="btn-theme rounded-lg px-2 py-1.5 text-xs transition">纯色背景</button>
+  </div>
+
+  <label class="mt-4 flex items-center justify-between text-sm">
+    <span>首页壁纸标题</span>
+    <input type="checkbox" data-banner-title class="h-4 w-4 accent-(--primary)" checked />
+  </label>
+  <label class="mt-3 flex items-center justify-between text-sm">
+    <span>卡片透明度（全屏透明模式）</span>
+  </label>
+  <input id="card-opacity-slider" type="range" min="0" max="1" step="0.05" value="0.5" class="mt-1 w-full accent-(--primary)" />
+
+  <p class="mt-5 text-xs font-semibold" style="color: var(--muted)">特效设置</p>
+  <div class="mt-2 space-y-2 text-sm">
+    <label class="flex items-center justify-between"><span>樱花特效</span><input type="checkbox" data-fx-sakura class="h-4 w-4 accent-(--primary)" /></label>
+    <label class="flex items-center justify-between"><span>水波纹动画</span><input type="checkbox" data-fx-ripple class="h-4 w-4 accent-(--primary)" /></label>
+    <label class="flex items-center justify-between"><span>渐变过渡</span><input type="checkbox" data-fx-gradient class="h-4 w-4 accent-(--primary)" checked /></label>
+  </div>
+
+  <p class="mt-5 text-xs font-semibold" style="color: var(--muted)">侧栏组件</p>
+  <div class="mt-2 grid grid-cols-2 gap-x-3 gap-y-1.5 text-sm">
+    <label class="flex items-center justify-between gap-2"><span>个人简介</span><input type="checkbox" data-widget-toggle="profile" checked /></label>
+    <label class="flex items-center justify-between gap-2"><span>公告</span><input type="checkbox" data-widget-toggle="notice" checked /></label>
+    <label class="flex items-center justify-between gap-2"><span>音乐播放器</span><input type="checkbox" data-widget-toggle="music" checked /></label>
+    <label class="flex items-center justify-between gap-2"><span>分类</span><input type="checkbox" data-widget-toggle="categories" checked /></label>
+    <label class="flex items-center justify-between gap-2"><span>标签云</span><input type="checkbox" data-widget-toggle="tags" checked /></label>
+    <label class="flex items-center justify-between gap-2"><span>归档摘要</span><input type="checkbox" data-widget-toggle="archive" checked /></label>
+    <label class="flex items-center justify-between gap-2"><span>最新动态</span><input type="checkbox" data-widget-toggle="moments" checked /></label>
+    <label class="flex items-center justify-between gap-2"><span>站点统计</span><input type="checkbox" data-widget-toggle="stats" checked /></label>
+    <label class="flex items-center justify-between gap-2"><span>站点信息</span><input type="checkbox" data-widget-toggle="info" checked /></label>
+    <label class="flex items-center justify-between gap-2"><span>日历</span><input type="checkbox" data-widget-toggle="calendar" checked /></label>
+    <label class="flex items-center justify-between gap-2"><span>文章目录</span><input type="checkbox" data-widget-toggle="toc" checked /></label>
+  </div>
+
+  <p class="mt-5 text-xs font-semibold" style="color: var(--muted)">文章布局</p>
+  <div class="mt-2 grid grid-cols-2 gap-1.5" data-layout-group>
+    <button type="button" data-layout="list" class="btn-theme rounded-lg px-2 py-1.5 text-xs transition">列表</button>
+    <button type="button" data-layout="grid" class="btn-theme rounded-lg px-2 py-1.5 text-xs transition">网格</button>
+  </div>
+</div>

@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SearchPanel from '../components/client/SearchPanel.astro';
+import SettingsPanel from '../components/client/SettingsPanel.astro';
+import Comments from '../components/client/Comments.astro';
+import moments from '../data/moments.json';
+import type { Moment } from '../lib/types';
+import { formatDateTime } from '../lib/utils';
+
+const visibleCount = 3;
+function anchorId(m: Moment): string {
+  return 'dynamic-' + m.date.replace(' ', '-').replace(/:/g, '');
+}
+---
+<BaseLayout title="动态" bannerTitle="动态">
+  <SearchPanel />
+  <SettingsPanel />
+  <div class="mx-auto max-w-3xl space-y-4 pb-10 pt-6">
+    <div class="card-base p-6">
+      <p class="widget-title">动态</p>
+      <p class="mt-2 text-xs" style="color: var(--muted)">一些碎碎念，共 {moments.length} 条</p>
+      <div class="mt-4" data-moments>
+        {moments.map((m, i) => (
+          <div id={anchorId(m)} class="relative flex gap-4 pb-6 last:pb-0" data-moment-item={i >= visibleCount ? 'more' : ''}>
+            <div class="flex flex-col items-center">
+              <span class="moment-dot shrink-0"></span>
+              {i < moments.length - 1 && <span class="moment-line mt-1 flex-1"></span>}
+            </div>
+            <div class="min-w-0 flex-1 pb-1">
+              <p class="text-xs font-semibold" style="color: var(--muted)">
+                <a href={`#${anchorId(m)}`} class="hover:text-primary">{formatDateTime(m.date)}</a>
+              </p>
+              <p class="mt-1 whitespace-pre-wrap text-sm leading-relaxed">{m.content}</p>
+              {m.images && m.images.length > 0 && (
+                <div class="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {m.images.map((src) => <img src={src} alt="" loading="lazy" decoding="async" width="800" height="600" class="aspect-[4/3] w-full rounded-xl object-cover" />)}
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+      {moments.length > visibleCount && (
+        <button type="button" data-show-more class="badge mt-4">更多动态</button>
+      )}
+    </div>
+    <Comments title="动态评论" storageKey="dynamic" />
+  </div>
+  <script>
+    const btn = document.querySelector('[data-show-more]');
+    btn?.addEventListener('click', () => {
+      document.querySelectorAll('[data-moment-item="more"]').forEach((el) => {
+        (el as HTMLElement).style.display = '';
+      });
+      btn.remove();
+    });
+    document.querySelectorAll('[data-moment-item="more"]').forEach((el) => {
+      (el as HTMLElement).style.display = 'none';
+    });
+  </script>
+</BaseLayout>

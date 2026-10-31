@@ -1,0 +1,17 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SettingsPanel from '../components/client/SettingsPanel.astro';
+---
+<BaseLayout title="搜索" bannerTitle="搜索" noBanner={false}>
+  <SettingsPanel />
+  <div class="mx-auto max-w-3xl pb-10 pt-6">
+    <div class="card-base p-6">
+      <div class="flex items-center gap-2 rounded-xl px-3" style="background: var(--page-bg)">
+        <svg class="h-5 w-5 shrink-0" style="color: var(--muted)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="page-search-input" type="search" placeholder="输入关键词搜索文章……（↑↓ 选择，Enter 打开）" class="w-full bg-transparent py-3 text-sm outline-none" autocomplete="off" />
+      </div>
+      <div id="page-search-results" class="mt-4 space-y-1"></div>
+      <div id="page-search-empty" class="hidden py-8 text-center text-sm" style="color: var(--muted)">找不到相关结果。</div>
+    </div>
+  </div>
+</BaseLayout>

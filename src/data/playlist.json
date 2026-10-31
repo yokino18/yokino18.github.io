@@ -1,0 +1,23 @@
+[
+  {
+    "title": "昔涟",
+    "artist": "张韶涵 × HOYO-MiX",
+    "cover": "/gallery/cover-music.svg",
+    "src": "/music/xilian.ogg",
+    "lyrics": []
+  },
+  {
+    "title": "致世界 To the World",
+    "artist": "HOYO-MiX",
+    "cover": "/gallery/cover-music.svg",
+    "src": "/music/zhishijie.ogg",
+    "lyrics": []
+  },
+  {
+    "title": "心忆 Remembrance of the Heart",
+    "artist": "HOYO-MiX",
+    "cover": "/gallery/cover-music.svg",
+    "src": "/music/xinyi.ogg",
+    "lyrics": []
+  }
+]

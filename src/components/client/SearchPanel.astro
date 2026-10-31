@@ -1,0 +1,17 @@
+<!-- 全局搜索浮层 -->
+<div id="search-backdrop" class="overlay-backdrop"></div>
+<div id="search-panel" class="float-panel top-20 left-4 right-4 p-2 md:left-auto md:right-6 md:w-120">
+  <div class="flex items-center gap-2 rounded-xl px-3" style="background: var(--page-bg)">
+    <svg class="h-5 w-5 shrink-0" style="color: var(--muted)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    <input
+      id="search-input"
+      type="search"
+      placeholder="搜索文章、标签……"
+      class="w-full bg-transparent py-3 text-sm outline-none"
+      autocomplete="off"
+    />
+    <button type="button" data-search-close class="scale-animation text-xs" style="color: var(--muted)">Esc</button>
+  </div>
+  <div id="search-results" class="max-h-[60vh] space-y-1 overflow-y-auto px-1 pb-1"></div>
+  <div id="search-empty" class="hidden px-3 py-8 text-center text-sm" style="color: var(--muted)">找不到相关结果。</div>
+</div>

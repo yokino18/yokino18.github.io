@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.astro/
+.DS_Store
+*.local
+.vscode/
+.idea/
+
+# 原始美术素材（体积大，仅本地留存）
+素材归档/
+
+# 本地预览日志
+.preview-*.log

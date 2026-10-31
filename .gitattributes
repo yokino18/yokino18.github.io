@@ -1,0 +1,10 @@
+# 统一换行符，避免 Windows/Linux 之间来回改行尾
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.ogg binary
+*.woff2 binary

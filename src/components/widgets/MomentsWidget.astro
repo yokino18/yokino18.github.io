@@ -1,0 +1,17 @@
+---
+import { formatDateTime } from '../../lib/utils';
+interface Props { moments: { date: string; content: string }[] }
+const { moments } = Astro.props;
+---
+<div class="card-base p-5 onload-animation">
+  <p class="widget-title">最新动态</p>
+  <ul class="mt-3 space-y-3 text-sm">
+    {moments.map((m) => (
+      <li>
+        <p class="text-xs" style="color: var(--muted)">{formatDateTime(m.date)}</p>
+        <p class="mt-1 line-clamp-4 leading-relaxed" style="color: var(--text)">{m.content}</p>
+      </li>
+    ))}
+  </ul>
+  <a href="/dynamic/" class="badge mt-3">更多动态</a>
+</div>

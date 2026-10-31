@@ -1,0 +1,120 @@
+---
+import '../styles/global.css';
+import { SITE, OG } from '../lib/site';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import Banner from '../components/Banner.astro';
+import Analytics from '../components/Analytics.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  bannerTitle?: string;
+  bannerSubtitle?: string;
+  isHome?: boolean;
+  noBanner?: boolean;
+  ogImage?: string;
+  ogType?: 'website' | 'article';
+  publishedTime?: string;
+}
+
+const {
+  title = SITE.title,
+  description = SITE.description,
+  bannerTitle,
+  bannerSubtitle,
+  isHome = false,
+  noBanner = false,
+  ogImage,
+  ogType = 'website',
+  publishedTime,
+} = Astro.props;
+
+const pageTitle = title === SITE.title ? SITE.title : `${title} - ${SITE.title}`;
+const siteOrigin = SITE.url.replace(/\/$/, '');
+const path = Astro.url.pathname;
+const canonical = siteOrigin + path;
+// SVG 不适合作为分享图，回退到默认 og 封面
+const ogImg = ogImage && !/\.svg$/i.test(ogImage) ? ogImage : OG.image;
+const websiteJsonLd = JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebSite', name: SITE.title, url: SITE.url, description: SITE.description });
+---
+
+<!doctype html>
+<html lang="zh-CN" class={isHome ? 'is-home' : ''}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="keywords" content="涟漪之篇, 古月, Astro, 博客, 技术博客, 静态博客, 教程, 日记, 摄影, 图片" />
+    <meta name="author" content={SITE.author} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:site_name" content={SITE.title} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:locale" content="zh_CN" />
+    <meta property="og:image" content={ogImg} />
+    <meta name="twitter:card" content={OG.twitterCard} />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImg} />
+    {ogType === 'article' && publishedTime && (
+      <meta property="article:published_time" content={publishedTime} />
+    )}
+    <script type="application/ld+json" set:html={websiteJsonLd} />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" href="/favicon/favicon.ico" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon/favicon-16x16.png" sizes="16x16" />
+    <link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png" />
+    <link rel="alternate" type="application/rss+xml" title={SITE.title} href="/rss.xml" />
+    
+    <script is:inline define:vars={{ defaultTheme: SITE.defaultTheme, defaultHue: SITE.hue }}>
+      // 主题初始化：避免闪烁（与 scripts/client.ts 保持一致）
+      (function () {
+        var LIGHT = 'light', DARK = 'dark', SYSTEM = 'system';
+        var theme = localStorage.getItem('theme') || defaultTheme;
+        var sys = window.matchMedia('(prefers-color-scheme: dark)').matches ? DARK : LIGHT;
+        var resolved = theme === SYSTEM ? sys : theme;
+        document.documentElement.classList.toggle(DARK, resolved === DARK);
+        var hue = localStorage.getItem('hue') || String(defaultHue);
+        document.documentElement.style.setProperty('--hue', hue);
+        var op = parseFloat(localStorage.getItem('overlayCardOpacity'));
+        if (Number.isFinite(op)) {
+          document.documentElement.style.setProperty('--card-transparent-opacity', String(Math.min(1, Math.max(0, op))));
+        }
+        var wm = localStorage.getItem('wallpaperMode');
+        if (wm) document.documentElement.setAttribute('data-wallpaper-mode', wm);
+        var fx = localStorage.getItem('effects');
+        if (fx && fx.indexOf('sakura') === -1) document.documentElement.classList.add('no-sakura');
+        var layout = localStorage.getItem('postLayout') || 'list';
+        document.documentElement.setAttribute('data-post-layout', layout);
+        var hw = localStorage.getItem('hiddenWidgets');
+        if (hw) {
+          try { hw = JSON.parse(hw); } catch (e) { hw = String(hw).split(','); }
+          if (Array.isArray(hw)) document.documentElement.setAttribute('data-hidden-widgets', hw.join(' '));
+        }
+      })();
+    </script>
+    <Analytics />
+  </head>
+  <body>
+    <Navbar />
+    {!noBanner && (
+      <Banner
+        title={bannerTitle ?? SITE.title}
+        subtitle={bannerSubtitle ?? SITE.subtitle}
+        isHome={isHome}
+      />
+    )}
+    <main class="mx-auto w-full px-2 md:px-4" style="max-width: var(--page-width)">
+      <slot />
+    </main>
+    <Footer />
+    <script>
+      import '../scripts/client.ts';
+    </script>
+  </body>
+</html>

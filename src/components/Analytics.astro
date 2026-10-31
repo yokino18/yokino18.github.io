@@ -1,0 +1,28 @@
+---
+// 站点统计：只上报页面浏览与来源，不采集敏感信息。
+// 在 src/lib/site.ts 的 ANALYTICS 中切换 provider 并填写对应 ID。
+import { ANALYTICS } from '../lib/site';
+
+const cfg = ANALYTICS;
+const la51Init = `LA.init({ id: ${JSON.stringify(cfg.la51.id)}, ck: ${JSON.stringify(cfg.la51.ck)} });`;
+---
+{cfg.provider === '51la' && (
+  <>
+    <script is:inline src="https://sdk.51.la/js-sdk-pro.min.js" id="LA_COOKIE"></script>
+    <script is:inline>{la51Init}</script>
+  </>
+)}
+{cfg.provider === 'umami' && (
+  <script is:inline async src={cfg.umami.src} data-website-id={cfg.umami.websiteId}></script>
+)}
+{cfg.provider === 'baidu' && (
+  <script is:inline>
+    var _hmt = _hmt || [];
+    (function () {
+      var hm = document.createElement('script');
+      hm.src = 'https://hm.baidu.com/hm.js?{cfg.baidu.id}';
+      var s = document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+)}

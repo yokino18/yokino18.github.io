@@ -1,0 +1,13 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SearchPanel from '../../components/client/SearchPanel.astro';
+import SettingsPanel from '../../components/client/SettingsPanel.astro';
+import Comments from '../../components/client/Comments.astro';
+---
+<BaseLayout title="动态评论" bannerTitle="动态评论">
+  <SearchPanel />
+  <SettingsPanel />
+  <div class="mx-auto max-w-3xl pb-10 pt-6">
+    <Comments title="动态评论" storageKey="dynamic-comments" />
+  </div>
+</BaseLayout>

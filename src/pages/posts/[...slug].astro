@@ -1,0 +1,108 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SearchPanel from '../../components/client/SearchPanel.astro';
+import SettingsPanel from '../../components/client/SettingsPanel.astro';
+import Comments from '../../components/client/Comments.astro';
+import TOCWidget from '../../components/widgets/TOCWidget.astro';
+import { Image, getImage } from 'astro:assets';
+import { render } from 'astro:content';
+import { getAllPosts } from '../../lib/stats';
+import { formatDate, readingTime, titleToId } from '../../lib/utils';
+import { SITE } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const posts = await getAllPosts();
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content, headings } = await render(post);
+const toc = headings.map((h) => ({
+  id: h.slug || titleToId(h.text),
+  text: h.text,
+  level: h.depth,
+}));
+const bodyText = (post as unknown as { body?: string }).body || post.data.description || '';
+const all = await getAllPosts();
+const idx = all.findIndex((p) => p.id === post.id);
+const prev = idx > 0 ? all[idx - 1] : null;
+const next = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null;
+const path = `/posts/${post.id}/`;
+const siteOrigin = SITE.url.replace(/\/$/, '');
+const pubISO = post.data.pubDate.toISOString();
+// 封面由 astro:assets 处理；OG / 结构化数据要绝对地址，单独生成 1200×630 的 jpg
+const ogCover = post.data.cover
+  ? siteOrigin + (await getImage({ src: post.data.cover, width: 1200, height: 630, fit: 'cover', format: 'jpeg', quality: 82 })).src
+  : undefined;
+const blogPostingLd = JSON.stringify({ '@context': 'https://schema.org', '@type': 'BlogPosting', headline: post.data.title, description: post.data.description, datePublished: pubISO, image: ogCover, author: { '@type': 'Person', name: SITE.author }, url: siteOrigin + path, publisher: { '@type': 'Organization', name: SITE.title } });
+---
+<BaseLayout
+  title={post.data.title}
+  description={post.data.description}
+  bannerTitle={post.data.title}
+  ogImage={ogCover}
+  ogType="article"
+  publishedTime={pubISO}
+>
+  <SearchPanel />
+  <SettingsPanel />
+  <div class="grid grid-cols-1 gap-4 pb-10 pt-4 xl:grid-cols-[minmax(0,1fr)_17.5rem]">
+    <div class="space-y-4">
+      <article class="card-base p-6 md:p-10">
+        <div class="flex flex-wrap items-center gap-2 text-sm" style="color: var(--muted)">
+          <a href={`/archive/?category=${encodeURIComponent(post.data.category)}`} class="badge">{post.data.category}</a>
+          <time datetime={formatDate(post.data.pubDate)}>{formatDate(post.data.pubDate)}</time>
+          <span>· 阅读约 {readingTime(bodyText)} 分钟</span>
+        </div>
+        <h1 class="mt-3 text-3xl font-bold leading-tight">{post.data.title}</h1>
+        {post.data.cover && (
+          <Image
+            src={post.data.cover}
+            alt={post.data.title}
+            widths={[480, 720, 1080, 1600]}
+            sizes="(min-width: 1280px) 720px, 100vw"
+            format="webp"
+            quality={80}
+            loading="eager"
+            decoding="async"
+            class="mt-6 aspect-[2/1] w-full rounded-2xl object-cover"
+          />
+        )}
+        <div class="markdown-body mt-6">
+          <Content />
+        </div>
+        <div class="mt-8 flex flex-wrap gap-1.5">
+          {post.data.tags.map((tag) => (
+            <a href={`/archive/?tag=${encodeURIComponent(tag)}`} class="badge">#{tag}</a>
+          ))}
+        </div>
+        <p class="mt-6 border-t pt-4 text-xs" style="color: var(--muted); border-color: var(--border)">
+          本文由 {SITE.author} 发布，采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener" style="color: var(--primary)">{SITE.license}</a> 许可协议。
+        </p>
+        <nav class="mt-6 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+          {prev ? (
+            <a href={`/posts/${prev.id}/`} class="card-base p-4 transition hover:text-primary">
+              <span class="block text-xs" style="color: var(--muted)">← 上一篇</span>
+              <span class="mt-1 line-clamp-1 font-semibold">{prev.data.title}</span>
+            </a>
+          ) : <span />}
+          {next ? (
+            <a href={`/posts/${next.id}/`} class="card-base p-4 text-right transition hover:text-primary">
+              <span class="block text-xs" style="color: var(--muted)">下一篇 →</span>
+              <span class="mt-1 line-clamp-1 font-semibold">{next.data.title}</span>
+            </a>
+          ) : <span />}
+        </nav>
+      </article>
+      <Comments title="评论" storageKey={`post-${post.id}`} />
+    </div>
+    <aside class="hidden space-y-4 xl:block">
+      <div data-widget="toc">
+        <TOCWidget headings={toc} />
+      </div>
+    </aside>
+  </div>
+</BaseLayout>
+
+<script type='application/ld+json' set:html={blogPostingLd} />
+

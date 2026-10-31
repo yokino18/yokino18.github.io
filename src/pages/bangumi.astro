@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SearchPanel from '../components/client/SearchPanel.astro';
+import SettingsPanel from '../components/client/SettingsPanel.astro';
+import bangumi from '../data/bangumi.json';
+
+const STATUS = ['全部', '想看', '在看', '看过'];
+---
+<BaseLayout title="番组计划" bannerTitle="番组计划">
+  <SearchPanel />
+  <SettingsPanel />
+  <div class="mx-auto max-w-3xl pb-10 pt-6">
+    <div class="mb-4 flex flex-wrap gap-1.5" data-status-filter>
+      {STATUS.map((s) => <button type="button" data-status={s} class="btn-theme rounded-lg px-3 py-1.5 text-xs">{s}</button>)}
+    </div>
+    <div class="space-y-4 stagger" data-bangumi-grid>
+      {bangumi.map((b) => (
+        <div class="card-base card-hover flex gap-4 p-4" data-bangumi-item={b.status}>
+          <img src={b.cover} alt={b.title} loading="lazy" decoding="async" width="160" height="224" class="h-28 w-20 shrink-0 rounded-xl object-cover" />
+          <div class="min-w-0 flex-1">
+            <p class="font-bold">{b.title}</p>
+            <p class="mt-1 text-sm" style="color: var(--muted)">{b.status} · 进度 {b.progress}</p>
+            <p class="mt-1 text-sm" style="color: var(--muted)">{b.note}</p>
+            <div class="mt-2 flex items-center gap-2 text-xs">
+              <span class="badge">评分 {b.score || '暂无'}</span>
+              <span style="color: var(--muted)">更新 {b.updated}</span>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+  <script>
+    const buttons = document.querySelectorAll('[data-status-filter] [data-status]');
+    const items = document.querySelectorAll('[data-bangumi-item]');
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        buttons.forEach((b) => b.classList.toggle('btn-theme-active', b === btn));
+        const status = btn.dataset.status;
+        items.forEach((el) => {
+          const show = status === '全部' || el.dataset.bangumiItem === status;
+          (el as HTMLElement).style.display = show ? '' : 'none';
+        });
+      });
+    });
+    (buttons[0] as HTMLButtonElement).classList.add('btn-theme-active');
+  </script>
+</BaseLayout>

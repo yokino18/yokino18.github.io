@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SearchPanel from '../components/client/SearchPanel.astro';
+import SettingsPanel from '../components/client/SettingsPanel.astro';
+import { getAllPosts, getTaxonomies } from '../lib/stats';
+
+const posts = await getAllPosts();
+const { categories } = getTaxonomies(posts);
+---
+<BaseLayout title="分类" bannerTitle="分类">
+  <SearchPanel />
+  <SettingsPanel />
+  <div class="mx-auto max-w-3xl pb-10 pt-6">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 stagger">
+      {categories.map((c) => (
+        <a href={`/archive/?category=${encodeURIComponent(c.name)}`} class="card-base card-hover block p-6">
+          <p class="text-lg font-bold">{c.name}</p>
+          <p class="mt-1 text-sm" style="color: var(--muted)">{c.count} 篇文章</p>
+        </a>
+      ))}
+    </div>
+  </div>
+</BaseLayout>

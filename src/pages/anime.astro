@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SearchPanel from '../components/client/SearchPanel.astro';
+import SettingsPanel from '../components/client/SettingsPanel.astro';
+import anime from '../data/anime.json';
+
+const STATUS = ['全部', '想看', '在看', '看过'];
+---
+<BaseLayout title="追番" bannerTitle="追番">
+  <SearchPanel />
+  <SettingsPanel />
+  <div class="mx-auto max-w-5xl pb-10 pt-6">
+    <div class="mb-4 flex flex-wrap gap-1.5" data-status-filter>
+      {STATUS.map((s) => <button type="button" data-status={s} class="btn-theme rounded-lg px-3 py-1.5 text-xs">{s}</button>)}
+    </div>
+    <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 stagger" data-anime-grid>
+      {anime.map((a) => (
+        <div class="card-base card-hover overflow-hidden" data-anime-item={a.status}>
+          <div class="relative aspect-[3/4] overflow-hidden">
+            <img src={a.cover} alt={a.title} loading="lazy" decoding="async" width="400" height="560" class="h-full w-full object-cover" />
+            <span class="absolute left-2 top-2 rounded-full bg-(--scrim) px-2 py-0.5 text-xs text-(--deep-text)">{a.status}</span>
+          </div>
+          <div class="p-3">
+            <p class="line-clamp-1 text-sm font-bold">{a.title}</p>
+            <p class="mt-1 text-xs" style="color: var(--muted)">进度 {a.progress}{a.score ? ` · 评分 ${a.score}` : ''}</p>
+            <p class="mt-1 text-xs" style="color: var(--muted)">更新 {a.updated}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+  <script>
+    const buttons = document.querySelectorAll('[data-status-filter] [data-status]');
+    const items = document.querySelectorAll('[data-anime-item]');
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        buttons.forEach((b) => b.classList.toggle('btn-theme-active', b === btn));
+        const status = btn.dataset.status;
+        items.forEach((el) => {
+          const show = status === '全部' || el.dataset.animeItem === status;
+          (el as HTMLElement).style.display = show ? '' : 'none';
+        });
+      });
+    });
+    (buttons[0] as HTMLButtonElement).classList.add('btn-theme-active');
+  </script>
+</BaseLayout>
+

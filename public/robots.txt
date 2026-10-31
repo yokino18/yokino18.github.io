@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://blog.casto.top/sitemap-index.xml

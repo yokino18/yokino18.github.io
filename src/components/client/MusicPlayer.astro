@@ -1,0 +1,48 @@
+---
+import type { PlaylistTrack } from '../../lib/types';
+interface Props { tracks: PlaylistTrack[] }
+const { tracks } = Astro.props;
+const json = JSON.stringify(tracks);
+---
+<div class="card-base p-5 onload-animation" data-player-card>
+  <div class="flex items-center justify-between">
+    <p class="widget-title">音乐</p>
+    <button type="button" data-pl-mini class="scale-animation rounded-lg px-2 py-0.5 text-xs" style="color: var(--muted)" aria-label="迷你模式" title="迷你模式">球·迷你</button>
+  </div>
+  <div class="mt-3 flex items-center gap-3" data-player>
+    <img data-pl-cover src="/gallery/cover-music.svg" alt="" class="h-12 w-12 rounded-xl object-cover" width="48" height="48" loading="lazy" decoding="async" />
+    <div class="min-w-0 flex-1">
+      <p data-pl-title class="truncate text-sm font-semibold">暂未播放</p>
+      <p data-pl-artist class="truncate text-xs" style="color: var(--muted)">0:00 / 0:00</p>
+    </div>
+  </div>
+  <div class="music-progress mt-3" data-pl-progress><div data-pl-bar></div></div>
+  <div class="mt-3 flex items-center justify-center gap-4 text-sm">
+    <button type="button" data-pl-prev class="scale-animation" aria-label="上一首">⏮</button>
+    <button type="button" data-pl-toggle class="grid h-9 w-9 place-items-center rounded-full text-(--btn-content)" style="background: var(--primary)" aria-label="播放/暂停">▶</button>
+    <button type="button" data-pl-next class="scale-animation" aria-label="下一首">⏭</button>
+  </div>
+  <div data-pl-lyrics class="mt-3 max-h-28 space-y-1 overflow-y-auto text-center text-xs">
+    <p class="lyric-line">暂无歌词</p>
+  </div>
+  <audio data-pl-audio preload="none"></audio>
+  <script type="application/json" data-playlist set:html={json}></script>
+</div>
+<button type="button" data-pl-ball class="fixed bottom-5 right-5 z-[70] hidden h-14 w-14 items-center justify-center rounded-full shadow-lg transition-transform hover:scale-105" style="background: var(--primary)" aria-label="展开播放器">
+  <img data-pl-ball-cover src="/gallery/cover-music.svg" alt="" class="h-10 w-10 rounded-full object-cover" />
+</button>
+
+<script>
+  // 延迟水合：首屏不加载播放器脚本，空闲时或滚动进入视口后再动态引入
+  const boot = () => {
+    const card = document.querySelector('[data-player-card]');
+    const ball = document.querySelector('[data-pl-ball]');
+    if (!card && !ball) return;
+    import('../../scripts/music').then((m) => m.initMusicPlayer());
+  };
+  if ('requestIdleCallback' in window) {
+    window.requestIdleCallback(boot, { timeout: 2500 });
+  } else {
+    setTimeout(boot, 1500);
+  }
+</script>
