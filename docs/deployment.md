@@ -1,85 +1,136 @@
 # 部署指南
 
-本博客是 Astro 7 静态站点，构建产物在 `dist/`，可部署到任意静态托管平台。以下分别说明 **Vercel、Netlify、Cloudflare Pages** 的部署步骤与自定义域名 `blog.xxx.top` 的绑定方法（把 `xxx` 换成你的域名主体）。
+本博客是 Astro 7 静态站点，构建产物在 `dist/`。当前正式发布方式是 **GitHub Pages + GitHub Actions**
+（线上地址 <https://yokino18.github.io/>），第 1、2 节讲这套流程；Vercel / Netlify / Cloudflare Pages
+作为备选方案列在第 3–5 节。
 
 ## 0. 前置准备（通用）
 
-- 本地环境：Node.js 22+，包管理器 pnpm 或 npm。
-- 把仓库推送到 GitHub（三家平台都支持从 Git 仓库导入）。
-- 部署前把站点域名改对（否则 sitemap / og 标签 / RSS 里的 URL 不对）：
-  - `astro.config.mjs`：`site: 'https://blog.xxx.top'`
-  - `src/lib/site.ts`：`SITE.domain` 与 `SITE.url` 改成正式域名
-- 构建命令统一为：`pnpm build`（无 pnpm 时用 `npm run build`），输出目录 `dist`。
-- 建议在平台环境变量里加 `ASTRO_TELEMETRY_DISABLED=1`，避免构建时上报遥测。
-- 若使用 pnpm，建议把 `package-lock.json` 换为 `pnpm-lock.yaml`（删掉前者，跑一次 `pnpm install` 生成），平台会优先按锁文件安装。
+- 本地环境：Node.js 22+，包管理器用 npm（仓库里是 `package-lock.json`，CI 也走 `npm ci`）。
+- **站点域名只在一个地方配置**：环境变量 `SITE_URL`。
+  - `astro.config.mjs` 读 `process.env.SITE_URL`，默认 `https://yokino18.github.io`
+  - `src/lib/site.ts` 的 `url` / `domain` 从 `import.meta.env.SITE` 推导，不再手写
+  - `canonical`、`og:image`、`sitemap-index.xml`、RSS 里的链接都会跟着变
+- 构建命令：`npm run build`，输出目录 `dist/`。
+- 建议加 `ASTRO_TELEMETRY_DISABLED=1`，避免构建时上报遥测。
+- 部署前自检：
 
-## 1. 部署到 Vercel
-
-1. 打开 [vercel.com](https://vercel.com) → **Add New… → Project** → 导入你的 Git 仓库。
-2. Framework Preset 会自动识别 **Astro**（若没有则手动选 Astro）。
-   - Build Command：`pnpm build`（或 `npm run build`）
-   - Output Directory：`dist`
-3. 在 Settings → General 里把 **Node.js Version** 设为 22。
-4. 添加环境变量：`ASTRO_TELEMETRY_DISABLED=1`。
-5. 点 **Deploy**，几分钟后得到 `https://<项目名>.vercel.app`。
-
-**绑定 blog.xxx.top**
-1. 项目 → **Settings → Domains** → 输入 `blog.xxx.top` → Add。
-2. 按提示在你的域名注册商处加 DNS 记录（二选一）：
-   - `CNAME`：`blog` → `cname.vercel-dns.com`
-   - 或 `A` 记录：`blog` → `76.76.21.21`
-3. 等待解析生效（一般几分钟），Vercel 自动签发 HTTPS 证书并强制跳转。
-
-## 2. 部署到 Netlify
-
-1. 打开 [app.netlify.com](https://app.netlify.com) → **Add new site → Import an existing project** → 选择 Git 仓库。
-2. 构建配置：
-   - Build command：`pnpm build`（或 `npm run build`）
-   - Publish directory：`dist`
-3. Settings → Build & deploy → Environment 中设置 `ASTRO_TELEMETRY_DISABLED=1`，并把 Node 版本切到 22（可在 Netlify 的 `netlify.toml` 里写 `[build.environment] NODE_VERSION = "22"`）。
-4. 部署完成后得到 `https://<站点名>.netlify.app`。
-
-**绑定 blog.xxx.top**
-1. 站点 → **Domain settings → Add a domain** → 输入 `blog.xxx.top`。
-2. DNS 解析（任选）：
-   - `CNAME`：`blog` → `<你的站点名>.netlify.app`
-   - 或 `A` 记录：`blog` → `75.2.60.5`
-3. 在 Domain settings → HTTPS 里开启 **Force HTTPS**，Netlify 会自动配证书。
-
-## 3. 部署到 Cloudflare Pages
-
-1. 打开 Cloudflare Dashboard → **Workers & Pages → Create → Pages → Connect to Git**。
-2. 选仓库，框架预设选 **Astro**（自动填好构建命令）。
-   - Build command：`pnpm build`
-   - Build output directory：`dist`
-   - 若构建 Node 版本不对，在 **Settings → Environment variables** 加 `NODE_VERSION = 22`。
-3. 保存并部署，得到 `https://<项目名>.pages.dev`。
-
-**绑定 blog.xxx.top**（域名最好也托管在 Cloudflare，最省事）
-1. Pages 项目 → **Custom domains → Set up a custom domain** → 输入 `blog.xxx.top`。
-2. 若域名已托管在 Cloudflare：会自动添加 CNAME 记录（`blog` → `<项目名>.pages.dev`），秒级生效。
-3. 若域名在其他注册商：手动在注册商处把 DNS 改为 Cloudflare 提供的两个 NS（先把域名托管迁移到 Cloudflare），或加 `CNAME blog → <项目名>.pages.dev`。
-4. SSL/TLS 建议用 **Full**，Cloudflare 自动签发证书。
-
-## 4. 自定义域名通用要点
-
-- 根域（`xxx.top`）和 `www.xxx.top`、`blog.xxx.top` 三者的跳转关系建议固定成一套：例如让 `www` 301 到 `blog`，避免 SEO 权重分散。
-- 绑定后务必**重新构建部署一次**，让 `site`、`SITE.url`、og 标签、sitemap、RSS 里的域名全部变为新域名。
-- 部署完成后验证：
   ```bash
-  curl -I https://blog.xxx.top/sitemap-index.xml
-  curl -I https://blog.xxx.top/rss.xml
-  curl -I https://blog.xxx.top/robots.txt
-  curl -I https://blog.xxx.top/og-cover.jpg
+  SITE_URL=https://你的域名 npm run build
+  grep -o 'rel="canonical" href="[^"]*"' dist/index.html
   ```
-- 缓存问题：更新部署后若旧内容未刷新，可在平台「Clear cache / Purge」后重试。
 
-## 5. 构建产物大小与压缩建议
+## 1. 部署到 GitHub Pages（当前方案）
 
-当前构建产物（`dist/`）约 **6-7 MB**，其中主要是壁纸/头像的 webp 与压缩后的静态图。更进一步的建议：
+1. **仓库名必须是 `<用户名>.github.io`**（本项目是 `yokino18.github.io`）。
+   GitHub 只把这个名字的仓库当**用户站点**，发布在根路径 `https://<用户名>.github.io/`。
+2. 仓库 **Settings → Pages → Build and deployment → Source** 选 **GitHub Actions**（只需设置一次）。
+3. 之后 `git push origin main` 即触发 `.github/workflows/deploy.yml`：
+   `actions/checkout` → `setup-node@22` → `npm ci` → `npm run build` → `upload-pages-artifact` → `deploy-pages`。
+4. 手动触发：**Actions → Deploy to GitHub Pages → Run workflow**。
+5. 验证：
 
-- **图片**：本项目壁纸/头像已走 `astro:assets`（构建期裁剪 + 转 webp），文章/相册封面当前为 SVG 占位图，换成真实照片后请直接放入 `src/assets/` 或使用 `<Image>` 组件，避免原图直接进 `public/`。
-- **传输压缩**：Vercel / Netlify / Cloudflare Pages 均默认对文本类资源启用 gzip/brotli，无需额外配置；若自建 Nginx，请开启 `gzip` / `brotli` 并把 `_astro/` 目录设为长缓存（`Cache-Control: public, max-age=31536000, immutable`）。
-- **字体**：当前使用系统字体栈，无自托管字体，已是最优；若日后引入 woff2，建议按需子集化。
-- **JS**：播放器脚本已拆分为独立懒加载 chunk；主脚本约 50KB，如继续优化可把搜索索引改为按需加载。
-- 可用 `npx astro build` 后用任意目录大小工具复查；如果单张图片仍偏大，优先降低 `quality` 或缩小输出宽度。
+   ```bash
+   curl -I https://yokino18.github.io/
+   curl -I https://yokino18.github.io/sitemap-index.xml
+   curl -I https://yokino18.github.io/rss.xml
+   ```
+
+> ⚠️ 如果仓库名不是 `<用户名>.github.io`（项目站点），页面会发布在 `/<仓库名>` 子路径下，
+> 此时必须给 `astro.config.mjs` 加 `base: '/<仓库名>'`，并且把所有写死的 `/music/...`、`/gallery/...`、
+> `/favicon/...` 改成带 `base` 的路径——成本很高，不推荐。要自定义仓库名就配自定义域名（见下一节）。
+
+## 2. 绑定自定义域名（GitHub Pages）
+
+前提：能修改该域名的 DNS（Cloudflare、阿里云、腾讯云均可）。
+
+1. **DNS**：加一条记录
+
+   | 类型 | 主机记录 | 值 | 代理 |
+   |---|---|---|---|
+   | CNAME | 子域（如 `blog`） | `yokino18.github.io` | **关闭（Cloudflare 灰云）** |
+
+   > 橙色云（代理）会让 GitHub 的域名校验和证书签发失败，务必 DNS only。根域用 A 记录指向
+   > `185.199.108.153` / `185.199.109.153` / `185.199.110.153` / `185.199.111.153`。
+
+2. **代码**（四处一起改，否则 canonical/OG 会指向旧域名）：
+
+   ```bash
+   # 1) 新建 public/CNAME，内容为域名本身
+   echo "blog.example.com" > public/CNAME
+   # 2) .github/workflows/deploy.yml 的 env.SITE_URL
+   # 3) astro.config.mjs 里 SITE_URL 的默认值
+   # 4) src/lib/site.ts 里 fallback 域名
+   ```
+
+3. **GitHub**：Settings → Pages → Custom domain 填域名 → Save → 等 DNS 校验通过（几分钟）
+   → 勾 **Enforce HTTPS**（证书签发通常 1–30 分钟）。
+
+注意：GitHub Pages 一个仓库只能绑一个自定义域名；绑定后 `yokino18.github.io` 会 301 跳到该域名。
+换域名/换 NS 时旧记录先别删，确认新站可用再清理。
+
+## 3. 部署到 Vercel
+
+1. 打开 [vercel.com](https://vercel.com) → **Add New… → Project** → 导入 Git 仓库。
+2. Framework Preset 自动识别 **Astro**（没有就手动选）。
+   - Build Command：`npm run build`
+   - Output Directory：`dist`
+3. Settings → General 把 **Node.js Version** 设为 22。
+4. 环境变量加 `ASTRO_TELEMETRY_DISABLED=1`（要绑域名再加 `SITE_URL`）。
+5. 点 **Deploy**，得到 `https://<项目名>.vercel.app`。
+
+**绑定自定义域名**：Settings → Domains → 输入域名 → 按提示加 DNS：
+`CNAME 子域 → cname.vercel-dns.com`（或 `A 子域 → 76.76.21.21`），证书自动签发。
+
+## 4. 部署到 Netlify
+
+1. [app.netlify.com](https://app.netlify.com) → **Add new site → Import an existing project**。
+2. Build command `npm run build`，Publish directory `dist`。
+3. 环境变量 `ASTRO_TELEMETRY_DISABLED=1`；Node 版本在 `netlify.toml` 里写
+   `[build.environment] NODE_VERSION = "22"`。
+4. **域名**：Domain settings → Add a domain → `CNAME 子域 → <站点名>.netlify.app`，
+   然后在 HTTPS 里开 **Force HTTPS**。
+
+## 5. 部署到 Cloudflare Pages
+
+1. Cloudflare Dashboard → **Workers & Pages → Create → Pages → Connect to Git**。
+2. 框架预设选 **Astro**；Build command `npm run build`，输出 `dist`；
+   Node 版本不对时加环境变量 `NODE_VERSION = 22`。
+3. 得到 `https://<项目名>.pages.dev`。
+4. **域名**（域名已托管在 Cloudflare 时最省事）：Custom domains → Set up a custom domain，
+   会自动加 `CNAME 子域 → <项目名>.pages.dev`；SSL/TLS 模式选 **Full**。
+
+## 6. 自定义域名通用要点
+
+- 根域、`www`、子域之间的跳转关系固定成一套（例如 `www` 301 到子域），避免权重分散。
+- 绑定后**重新构建部署一次**，让 `site`、`SITE.url`、og 标签、sitemap、RSS 全部换成新域名。
+- 缓存：更新后旧内容没刷新，先在平台侧 Purge / 等 CDN TTL 过期再排查。
+- 验证清单：
+
+  ```bash
+  curl -I https://你的域名/
+  curl -I https://你的域名/sitemap-index.xml
+  curl -I https://你的域名/rss.xml
+  curl -I https://你的域名/robots.txt
+  ```
+
+## 7. 构建产物大小与压缩建议
+
+当前 `dist/` 约 **23 MB**，构成：
+
+| 部分 | 大小 |
+|---|---|
+| `public/music` 三首 `.ogg` | ≈ 19 MB |
+| 壁纸 / 头像（`astro:assets` 转的 webp） | ≈ 1.5 MB |
+| 文章封面多档 WebP | ≈ 0.6 MB |
+| HTML + CSS + JS | ≈ 0.5 MB |
+
+建议：
+
+- **音乐**是体积大头。想减小可以：降低码率（128k → 96k）、改用 `.m4a`/`.opus`、或把音频放到对象存储/CDN，
+  `src/data/playlist.json` 里直接写外链即可。
+- **图片**：壁纸、头像、文章封面都已走 `astro:assets`（构建期裁剪 + 多档 WebP + srcset），
+  新图放 `src/assets/`，不要在 `public/` 里堆原图。
+- **文本压缩**：GitHub Pages / Vercel / Netlify / Cloudflare Pages 都默认 gzip/brotli，无需配置；
+  自建 Nginx 请开 `gzip` 并给 `_astro/` 设长缓存。
+- **字体**：当前用系统字体栈，无自托管字体，已是最优。

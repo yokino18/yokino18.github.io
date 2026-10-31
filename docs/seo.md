@@ -12,14 +12,14 @@
 
 ## 上线前检查清单
 
-1. `astro.config.mjs` 的 `site` 与 `src/lib/site.ts` 的 `SITE.domain/url` 已是正式域名（如 `https://blog.xxx.top/`）。
-2. 默认分享图 `public/og-cover.jpg` 可访问：`https://blog.xxx.top/og-cover.jpg`。
+1. `astro.config.mjs` 的 `site` 与 `src/lib/site.ts` 的 `SITE.domain/url` 已是正式域名（当前为 `https://yokino18.github.io/`）。
+2. 默认分享图 `public/og-cover.jpg` 可访问：`https://yokino18.github.io/og-cover.jpg`。
 3. 构建后本地抽查：
    ```bash
-   curl -I https://blog.xxx.top/sitemap-index.xml
-   curl -I https://blog.xxx.top/rss.xml
-   curl -I https://blog.xxx.top/robots.txt
-   curl https://blog.xxx.top/robots.txt   # 应包含 Sitemap 行
+   curl -I https://yokino18.github.io/sitemap-index.xml
+   curl -I https://yokino18.github.io/rss.xml
+   curl -I https://yokino18.github.io/robots.txt
+   curl https://yokino18.github.io/robots.txt   # 应包含 Sitemap 行
    ```
 4. 用社交调试器检查分享卡片是否正常（Facebook Sharing Debugger / X Card Validator / 微信 JSSDK 分享调试），重点看 `og:image` 是否为可访问的绝对地址且非 SVG。
 
@@ -27,19 +27,19 @@
 
 ### Google（搜索份额最大，优先做）
 1. 打开 [Google Search Console](https://search.google.com/search-console) → 添加资源。
-2. 选择「**网域**」并输入 `xxx.top`，用 DNS TXT 记录验证（最推荐，一次验证全域名）；
-   或选择「**网址前缀**」输入 `https://blog.xxx.top/`，上传 HTML 验证文件或加 meta 标签验证。
-3. 验证通过后，在「Sitemap」提交：`https://blog.xxx.top/sitemap-index.xml`。
+2. 选择「**网址前缀**」输入 `https://yokino18.github.io/`，用 HTML 文件或 meta 标签验证
+   （`github.io` 的 DNS 不归你管，用不了「网域」验证；等以后绑了自有域名再改用 DNS TXT 验证）。
+3. 验证通过后，在「Sitemap」提交：`https://yokino18.github.io/sitemap-index.xml`。
 4. 用「网址检查」工具对首页和一两篇文章发起「请求编入索引」，加速首次收录。
 
 ### Bing（可同步 Google）
 1. [Bing Webmaster Tools](https://www.bing.com/webmasters) 支持「从 Google Search Console 导入」，GSC 验证后一键导入。
-2. 或在「站点地图」处直接提交 `https://blog.xxx.top/sitemap-index.xml`。
+2. 或在「站点地图」处直接提交 `https://yokino18.github.io/sitemap-index.xml`。
 
 ### 百度（国内站建议做）
-1. 打开 [百度搜索资源平台](https://ziyuan.baidu.com/) → 添加站点 `blog.xxx.top`。
+1. 打开 [百度搜索资源平台](https://ziyuan.baidu.com/) → 添加站点 `yokino18.github.io`。
 2. 验证方式选「HTML 标签」或「文件验证」，按提示把验证代码放到 `<head>` 中（可临时加在 `src/layouts/BaseLayout.astro`，验证完成后删除）。
-3. 提交 sitemap：百度对 XML sitemap 兼容度一般，可用「普通收录 → sitemap」提交 `https://blog.xxx.top/sitemap-index.xml`，并多用「手动提交 URL」提交新文章。
+3. 提交 sitemap：百度对 XML sitemap 兼容度一般，可用「普通收录 → sitemap」提交 `https://yokino18.github.io/sitemap-index.xml`，并多用「手动提交 URL」提交新文章。
 4. 想更主动的话开通「API 推送」：在 CI（GitHub Actions）里构建后把新 URL 推送到百度收录 API（需要准入），或用「快速收录」提交。
 
 ### 其他

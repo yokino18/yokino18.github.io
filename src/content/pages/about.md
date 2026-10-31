@@ -21,8 +21,7 @@
 
 ## 联系方式
 
-- 邮箱：hello@casto.top
-- 网站：[blog.casto.top](https://blog.casto.top/)
+- 网站：<https://yokino18.github.io/>
 
 ## 社交链接
 
@@ -32,6 +31,6 @@
 
 - 主题：Firefly（基于 Astro + Fuwari 开发）
 - 文章许可：CC BY-NC-SA 4.0
-- 更新时间：2026 年 8 月
+- 更新时间：2026 年 11 月
 
 > 本站所有内容均为个人学习与分享，如有引用会注明出处。
