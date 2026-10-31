@@ -17,6 +17,9 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # 试运行阶段指向 new.casto.top；正式切回 blog.casto.top 时改这一行（或删掉，默认即正式域名）
+    env:
+      SITE_URL: https://new.casto.top
     steps:
       - name: Checkout
         uses: actions/checkout@v4

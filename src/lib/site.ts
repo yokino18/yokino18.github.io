@@ -3,13 +3,17 @@ import avatarImg from '../assets/avatar-xixi.png';
 import wallpaperHome from '../assets/wallpaper-home-xixi.png';
 import wallpaperInner from '../assets/wallpaper-inner-xixi.jpg';
 
+// 站点地址跟随 astro.config.mjs 的 site（可用 SITE_URL 环境变量覆盖），避免两处手改不一致
+const SITE_URL = `${(import.meta.env.SITE || 'https://blog.casto.top/').replace(/\/+$/, '')}/`;
+const SITE_HOST = new URL(SITE_URL).host;
+
 export const SITE = {
   title: '涟漪之篇',
   shortName: '涟漪之篇',
   description: '欢迎来到我写的网站',
   author: '古月',
-  domain: 'blog.casto.top',
-  url: 'https://blog.casto.top/',
+  domain: SITE_HOST,
+  url: SITE_URL,
   license: 'CC BY-NC-SA 4.0',
   blogVersion: 'v0.1.0',
   hue: 350,
